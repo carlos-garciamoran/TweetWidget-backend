@@ -1,11 +1,13 @@
 import { supabaseClient } from '../_shared/supabaseAdmin.ts'
 import { twitterClient } from '../_shared/twitterClient.ts'
+import { User } from './types.ts'
 
+// TODO: move to .env
 const MAX_RETRIES = 15
 const MIN_DATE = new Date(2010, 11, 6)  // As specified by the API
-const MONTH_INTERVAL = 4
+const MONTH_INTERVAL = 3
 
-export async function getTrackedUsers() {
+export async function getTrackedUsers(): Promise<User[]|null> {
   const { data, error } = await supabaseClient
     .from('tracked_users')
     .select('id, username')
@@ -18,16 +20,16 @@ export async function getTrackedUsers() {
   return data
 }
 
-export async function getRandomUserTweet(user: { id: string; }&{ username: string; }) {
+export async function getRandomUserTweet(user: User): Promise<string|null> {
   const data = undefined
   let tries = 0
 
-  console.log(`[*] Getting tweets for ${user.username}...`)
+  console.log(`[*] Getting tweets from ${user.username}...`)
 
   while (data === undefined && tries < MAX_RETRIES) {
     const [start, end] = generateRandomDates()
 
-    console.log(`\t[*] Searching between ${start.split('T')} and ${end}...`)
+    console.log(`\t[*] Searching between ${start.split('T')[0]} and ${end.split('T')[0]}...`)
 
     try {
       const { data, meta } = await twitterClient.tweets.usersIdTweets(user.id, {
@@ -38,6 +40,8 @@ export async function getRandomUserTweet(user: { id: string; }&{ username: strin
       })
 
       if (data && meta?.result_count) {
+        console.log(`\t[+] Got tweet!\n`)
+
         const randomIndex = Math.floor(Math.random() * meta.result_count)
 
         return data[randomIndex].text
@@ -53,7 +57,7 @@ export async function getRandomUserTweet(user: { id: string; }&{ username: strin
   return null
 }
 
-function generateRandomDates() {
+function generateRandomDates(): string[] {
   const now = new Date()
 
   // Get a random date from MIN_DATE til now.
@@ -62,7 +66,7 @@ function generateRandomDates() {
   )
   const start_month = randomStartDate.getMonth()
 
-  // Add 1 month to the start date.
+  // Add MONTH_INTERVAL month to the start date.
   const randomEndDate = new Date(randomStartDate.setMonth(start_month + MONTH_INTERVAL))
 
   // Increase year by 1 if there's a month carry.
@@ -83,14 +87,4 @@ async function _getTweetById(id: string) {
   const tweet = await twitterClient.tweets.findTweetById(id);
 
   console.log(tweet)
-}
-
-async function _getUserId(username: string) {
-  const { data, errors } = await twitterClient.users.findUserByUsername(username)
-
-  if (data)   return data.id
-
-  console.error(errors)
-
-  return ''
 }

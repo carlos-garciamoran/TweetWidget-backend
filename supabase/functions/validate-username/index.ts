@@ -13,19 +13,16 @@ serve(async (req) => {
     isValid: false,
   }
 
-  console.log(`Validating username "${username}"...`)
-
   try {
-    const { data, errors } = await twitterClient.users.findUserByUsername(username)
+    const { data: user, errors } = await twitterClient.users.findUserByUsername(username)
 
-    // Check if the username is legit.
-    if (data) {
+    if (user) {
       resp.isValid = true
 
       const { error } = await supabaseClient
         .from('tracked_users')
         .insert({
-          id: data.id,
+          id: user.id,
           username: username,
         })
 

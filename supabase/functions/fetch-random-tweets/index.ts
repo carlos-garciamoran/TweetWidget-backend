@@ -1,40 +1,37 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { getRandomUserTweet, getTrackedUsers } from './helpers.ts'
+
 import { supabaseClient } from '../_shared/supabaseAdmin.ts'
+import { getRandomUserTweet, getTrackedUsers } from './helpers.ts'
+import { Tweet, User } from './types.ts'
 
 serve(async (_req) => {
   const resp = {
     error: '',
   }
 
-  const randomTweets : {
-    username: string,
-    tweet: string|null,
-  }[] = []
+  const randomTweets : Tweet[] = []
 
-  const users = await getTrackedUsers()
+  const users: User[]|null = await getTrackedUsers()
 
   if (users) {
     for (const user of users) {
       const randomTweet = await getRandomUserTweet(user)
 
-      randomTweets.push({
-        username: user.username,
-        tweet: randomTweet,
-      })
+      if (randomTweet)
+        randomTweets.push({
+          username: user.username,
+          tweet: randomTweet,
+        })
     }
   }
 
-  console.log(randomTweets)
+  const { error } = await supabaseClient
+    .from('daily_tweets')
+    .upsert(randomTweets)
+    .select()
 
-  // TODO: store in dailyTweets table
-  // const { data, errors } = supabaseClient
-  //   .from('daily_tweets')
-  //   .upsert(randomTweets)
-  //   .select()
-
-  // console.log(data)
-  // console.log(errors)
+  if (error)
+    resp.error = error.message
 
   return new Response(
     JSON.stringify(resp),
