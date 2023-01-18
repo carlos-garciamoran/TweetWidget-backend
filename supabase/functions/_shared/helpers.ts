@@ -1,11 +1,11 @@
-import { supabaseClient } from '../_shared/supabaseAdmin.ts'
-import { twitterClient } from '../_shared/twitterClient.ts'
+import { supabaseClient } from './supabaseAdmin.ts'
+import { twitterClient } from './twitterClient.ts'
 import { User } from './types.ts'
 
 // TODO: move to .env
 const MAX_RETRIES = 15
 const MIN_DATE = new Date(2010, 11, 6)  // As specified by the API
-const MONTH_INTERVAL = 3
+const MONTH_INTERVAL = 6
 
 export async function getTrackedUsers(): Promise<User[]|null> {
   const { data, error } = await supabaseClient
@@ -20,11 +20,12 @@ export async function getTrackedUsers(): Promise<User[]|null> {
   return data
 }
 
-export async function getRandomUserTweet(user: User): Promise<string|null> {
+// TODO: get tweet date, likes, and retweets.
+export async function getRandomUserTweet(id: string): Promise<string|null> {
   const data = undefined
   let tries = 0
 
-  console.log(`[*] Getting tweets from ${user.username}...`)
+  console.log(`[*] Getting tweets for ${id}...`)
 
   while (data === undefined && tries < MAX_RETRIES) {
     const [start, end] = generateRandomDates()
@@ -32,7 +33,7 @@ export async function getRandomUserTweet(user: User): Promise<string|null> {
     console.log(`\t[*] Searching between ${start.split('T')[0]} and ${end.split('T')[0]}...`)
 
     try {
-      const { data, meta } = await twitterClient.tweets.usersIdTweets(user.id, {
+      const { data, meta } = await twitterClient.tweets.usersIdTweets(id, {
         exclude: ['replies', 'retweets'],
         start_time: start,
         end_time: end,

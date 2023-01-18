@@ -1,8 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
+import { getRandomUserTweet, getTrackedUsers } from '../_shared/helpers.ts'
 import { supabaseClient } from '../_shared/supabaseAdmin.ts'
-import { getRandomUserTweet, getTrackedUsers } from './helpers.ts'
-import { Tweet, User } from './types.ts'
+import { Tweet, User } from '../_shared/types.ts'
 
 serve(async (_req) => {
   const resp = {
@@ -15,7 +15,7 @@ serve(async (_req) => {
 
   if (users) {
     for (const user of users) {
-      const randomTweet = await getRandomUserTweet(user)
+      const randomTweet = await getRandomUserTweet(user.id)
 
       if (randomTweet)
         randomTweets.push({
