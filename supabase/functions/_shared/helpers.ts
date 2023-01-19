@@ -1,11 +1,12 @@
 import { supabaseClient } from './supabaseAdmin.ts'
 import { twitterClient } from './twitterClient.ts'
-import { User } from './types.ts'
+import { Tweet, User } from './types.ts'
 
 // TODO: move to .env
 const MAX_RETRIES = 15
-const MIN_DATE = new Date(2010, 11, 6)  // As specified by the API
-const MONTH_INTERVAL = 6
+const MIN_DATE = new Date(2020, 1, 1)
+const MONTH_INTERVAL = 2  // Interval between start and end date
+const MONTHS_BEHIND = 3
 
 export async function getTrackedUsers(): Promise<User[]|null> {
   const { data, error } = await supabaseClient
@@ -20,17 +21,16 @@ export async function getTrackedUsers(): Promise<User[]|null> {
   return data
 }
 
-// TODO: get tweet date, likes, and retweets.
-export async function getRandomUserTweet(id: string): Promise<string|null> {
+export async function getRandomUserTweet(id: string, username: string): Promise<Tweet|null> {
   const data = undefined
   let tries = 0
 
-  console.log(`[*] Getting tweets for ${id}...`)
+  // console.log(`[*] Getting tweets for ${id}...`)
 
   while (data === undefined && tries < MAX_RETRIES) {
     const [start, end] = generateRandomDates()
 
-    console.log(`\t[*] Searching between ${start.split('T')[0]} and ${end.split('T')[0]}...`)
+    // console.log(`\t[*] Searching ${start.split('T')[0]} to ${end.split('T')[0]}...`)
 
     try {
       const { data, meta } = await twitterClient.tweets.usersIdTweets(id, {
@@ -38,16 +38,27 @@ export async function getRandomUserTweet(id: string): Promise<string|null> {
         start_time: start,
         end_time: end,
         max_results: 5,
+        'tweet.fields': ['public_metrics'],
       })
 
       if (data && meta?.result_count) {
-        console.log(`\t[+] Got tweet!\n`)
+        // console.log(`\t[+] Got tweet!\n`)
 
         const randomIndex = Math.floor(Math.random() * meta.result_count)
 
-        return data[randomIndex].text
+        const { public_metrics, text } = data[randomIndex]
+
+        if (public_metrics) {
+          const tweet: Tweet = {
+            username: username,
+            text: text,
+            like_count: public_metrics.like_count,
+            retweet_count: public_metrics.retweet_count,
+          }
+
+          return tweet
+        }
       } else {
-        console.log(`\t[${tries}] Got no tweets, retrying...\n`)
         tries += 1
       }
     } catch ({ error }) {
@@ -61,7 +72,9 @@ export async function getRandomUserTweet(id: string): Promise<string|null> {
 function generateRandomDates(): string[] {
   const now = new Date()
 
-  // Get a random date from MIN_DATE til now.
+  now.setMonth(now.getMonth() - MONTHS_BEHIND)
+
+  // Get a random date from MIN_DATE till now minus MONTHS_BEHIND.
   const randomStartDate = new Date(
     MIN_DATE.getTime() + Math.random() * (now.getTime() - MIN_DATE.getTime())
   )
@@ -82,10 +95,4 @@ function generateRandomDates(): string[] {
     randomStartDate.toISOString().split('.')[0] + 'Z',
     randomEndDate.toISOString().split('.')[0] + 'Z',
   ]
-}
-
-async function _getTweetById(id: string) {
-  const tweet = await twitterClient.tweets.findTweetById(id);
-
-  console.log(tweet)
 }

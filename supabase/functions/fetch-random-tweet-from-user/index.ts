@@ -6,17 +6,16 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 import { getRandomUserTweet } from '../_shared/helpers.ts'
 import { supabaseClient } from '../_shared/supabaseAdmin.ts'
-
-console.log("Hello from Functions!")
+import { Tweet } from '../_shared/types.ts'
 
 serve(async (req) => {
   const { id, username } = await req.json()
-  const resp = {
-    error: '',
-    tweet: '',
+  const resp : { error: null|string; tweet: null|Tweet } = {
+    error: null,
+    tweet: null,
   }
 
-  const randomTweet = await getRandomUserTweet(id)
+  const randomTweet = await getRandomUserTweet(id, username)
 
   if (randomTweet) {
     resp.tweet = randomTweet

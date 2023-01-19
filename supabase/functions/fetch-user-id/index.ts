@@ -6,11 +6,11 @@ import { twitterClient } from '../_shared/twitterClient.ts'
 serve(async (req) => {
   const { username } = await req.json()
   const resp: {
-    error: string|null|undefined,
     id: string|null,
+    error: string|null|undefined,
   } = {
-    error: null,
     id: null,
+    error: null,
   }
 
   try {

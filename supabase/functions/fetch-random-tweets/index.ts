@@ -5,23 +5,18 @@ import { supabaseClient } from '../_shared/supabaseAdmin.ts'
 import { Tweet, User } from '../_shared/types.ts'
 
 serve(async (_req) => {
-  const resp = {
-    error: '',
+  const resp: { error: null|string; } = {
+    error: null,
   }
-
   const randomTweets : Tweet[] = []
-
   const users: User[]|null = await getTrackedUsers()
 
   if (users) {
     for (const user of users) {
-      const randomTweet = await getRandomUserTweet(user.id)
+      const tweet = await getRandomUserTweet(user.id, user.username)
 
-      if (randomTweet)
-        randomTweets.push({
-          username: user.username,
-          tweet: randomTweet,
-        })
+      if (tweet)
+        randomTweets.push(tweet)
     }
   }
 

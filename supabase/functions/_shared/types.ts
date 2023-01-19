@@ -1,6 +1,8 @@
 export type Tweet = {
   username: string;
-  tweet: string|null;
+  text: string;
+  like_count: number;
+  retweet_count: number;
 }
 
 export type User = {
