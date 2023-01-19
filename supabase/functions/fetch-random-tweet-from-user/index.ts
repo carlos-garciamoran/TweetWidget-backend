@@ -1,7 +1,3 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 import { getRandomUserTweet } from '../_shared/helpers.ts'
@@ -22,10 +18,7 @@ serve(async (req) => {
 
     const { error: dbError } = await supabaseClient
       .from('daily_tweets')
-      .insert({
-        tweet: randomTweet,
-        username: username,
-      })
+      .insert(randomTweet)
 
     console.error(dbError)
   }
