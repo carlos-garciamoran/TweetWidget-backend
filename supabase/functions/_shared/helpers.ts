@@ -53,6 +53,7 @@ export async function getRandomUserTweet(id: string, username: string): Promise<
             username: username,
             text: text,
             like_count: public_metrics.like_count,
+            reply_count: public_metrics.reply_count,
             retweet_count: public_metrics.retweet_count,
           }
 

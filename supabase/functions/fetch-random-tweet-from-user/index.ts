@@ -20,7 +20,7 @@ serve(async (req) => {
       .from('daily_tweets')
       .insert(randomTweet)
 
-    console.error(dbError)
+    if (dbError)  console.error(dbError)
   }
   else  resp.error = 'No tweets found'
 

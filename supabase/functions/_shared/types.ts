@@ -2,6 +2,7 @@ export type Tweet = {
   username: string;
   text: string;
   like_count: number;
+  reply_count: number;
   retweet_count: number;
 }
 
