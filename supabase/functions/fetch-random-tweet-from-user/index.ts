@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const { error: dbError } = await supabaseClient
       .from('daily_tweets')
-      .insert(randomTweet)
+      .upsert(randomTweet)
 
     if (dbError)  console.error(dbError)
   }
