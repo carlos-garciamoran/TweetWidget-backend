@@ -1,4 +1,5 @@
 export type Tweet = {
+  id: string;
   username: string;
   text: string;
   like_count: number;

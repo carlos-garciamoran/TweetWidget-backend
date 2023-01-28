@@ -46,10 +46,11 @@ export async function getRandomUserTweet(id: string, username: string): Promise<
 
         const randomIndex = Math.floor(Math.random() * meta.result_count)
 
-        const { public_metrics, text } = data[randomIndex]
+        const { id, public_metrics, text } = data[randomIndex]
 
         if (public_metrics) {
           const tweet: Tweet = {
+            id: id,
             username: username,
             text: text,
             like_count: public_metrics.like_count,
