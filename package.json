@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "author": "Carlos García Morán",
   "description": "Supabase Edge Functions for the TweetWidget app",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "supabase": "^1.50.4"
+  }
 }
