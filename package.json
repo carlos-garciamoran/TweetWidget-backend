@@ -1,8 +1,8 @@
 {
   "name": "tweetwidget-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Carlos García Morán",
-  "description": "Supabase Edge Functions for the TweetWidget app",
+  "description": "Supabase Edge functions for the TweetWidget app",
   "license": "MIT",
   "devDependencies": {
     "supabase": "^1.50.4"

@@ -11,6 +11,12 @@ serve(async (_req) => {
   const randomTweets : Tweet[] = []
   const users: User[]|null = await getTrackedUsers()
 
+  /** New Strategy:
+   * TODO: instead of fetching a fresh tweet from the iOS client through the Twitter API directly,
+   *       fetch a random tweet from the Supabase `tweets` table. If there's none, fetch a fresh one. 
+   * 
+   *       Then, have a cron job fetching and saving new tweets from added users every 24 hours or so.
+  */
   if (users) {
     for (const user of users) {
       const tweet = await getRandomUserTweet(user.id, user.username)
@@ -21,7 +27,7 @@ serve(async (_req) => {
   }
 
   const { error } = await supabaseClient
-    .from('daily_tweets')
+    .from('tweets')
     .upsert(randomTweets)
     .select()
 

@@ -7,12 +7,13 @@ serve(async (req) => {
   const { username } = await req.json()
   const resp: {
     id: string|null,
-    error: string|null|undefined,
+    error: string | null,
   } = {
     id: null,
     error: null,
   }
 
+  // TODO: when getting a twitter error, check to see if related to rate limit.
   try {
     const { data: user, errors: twitterError } = await twitterClient.users.findUserByUsername(username)
 
@@ -20,7 +21,7 @@ serve(async (req) => {
       resp.id = user.id
 
       const { error: dbError } = await supabaseClient
-        .from('tracked_users')
+        .from('twitter_users')
         .insert({
           id: user.id,
           username: username,
@@ -28,7 +29,7 @@ serve(async (req) => {
 
       if (dbError)    resp.error = dbError.details
     } else if (twitterError) {
-      resp.error = twitterError[0].detail
+      resp.error = twitterError[0].detail ?? 'Unknown Twitter error'
     }
   } catch (_error) {
     resp.error = 'Unknown Twitter error'
@@ -41,7 +42,7 @@ serve(async (req) => {
 })
 
 // To invoke:
-// curl -i --location --request POST 'http://localhost:54321/functions/v1/' \
+// curl -i --location --request POST 'http://localhost:54321/functions/v1/fetch-user-id' \
 //   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
 //   --header 'Content-Type: application/json' \
 //   --data '{"username":"jack"}'
