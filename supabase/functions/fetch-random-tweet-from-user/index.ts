@@ -14,14 +14,14 @@ serve(async req => {
   const tweet = await getRandomTweetFromUser(id, username);
 
   if (tweet) {
-    resp.tweet = tweet;
-
     const { error: dbError } = await supabaseClient
       .from('tweets')
       .upsert(tweet);
 
     if (dbError) {
-      console.error(`[!] serve`, dbError);
+      resp.error = dbError.message;
+    } else {
+      resp.tweet = tweet; // Only return the tweet if it was successfully saved.
     }
   } else {
     resp.error = 'No tweets found';

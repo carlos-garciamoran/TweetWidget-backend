@@ -28,7 +28,9 @@ serve(async req => {
           username: username,
         });
 
-      if (dbError) resp.error = dbError.details;
+      if (dbError) {
+        resp.error = dbError.details;
+      }
     } else if (twitterError) {
       resp.error = twitterError[0].detail ?? 'Unknown Twitter error';
     }
