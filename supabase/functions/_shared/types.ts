@@ -5,9 +5,10 @@ export type Tweet = {
   like_count: number;
   reply_count: number;
   retweet_count: number;
-}
+  timestamp: string;
+};
 
 export type User = {
   id: string;
   username: string;
-}
+};
