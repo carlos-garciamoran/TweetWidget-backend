@@ -45,7 +45,7 @@ export async function getRandomTweetFromUser(
       });
 
       if (data && meta?.result_count) {
-        console.log(`[+] Got tweet!\n`, data);
+        // console.log(`[+] Got tweet!\n`, data);
 
         const randomIndex = Math.floor(Math.random() * meta.result_count);
 
