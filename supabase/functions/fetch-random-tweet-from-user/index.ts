@@ -4,6 +4,7 @@ import { getRandomTweetFromUser } from '../_shared/helpers.ts';
 import { supabaseClient } from '../_shared/supabaseAdmin.ts';
 import { Tweet } from '../_shared/types.ts';
 
+// TODO: when returning an error, set the status code to 4xx/5xx.
 serve(async req => {
   const { id, username } = await req.json();
   const resp: { error: null | string; tweet: null | Tweet } = {
@@ -19,7 +20,8 @@ serve(async req => {
       .upsert(tweet);
 
     if (dbError) {
-      resp.error = dbError.message;
+      console.error(dbError);
+      // resp.error = dbError.message;
     } else {
       resp.tweet = tweet; // Only return the tweet if it was successfully saved.
     }

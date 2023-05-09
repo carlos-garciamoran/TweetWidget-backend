@@ -3,6 +3,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { supabaseClient } from '../_shared/supabaseAdmin.ts';
 import { twitterClient } from '../_shared/twitterClient.ts';
 
+// TODO: when returning an error, set the status code to 4xx/5xx.
 serve(async req => {
   const { username } = await req.json();
   const resp: {
@@ -29,7 +30,8 @@ serve(async req => {
         });
 
       if (dbError) {
-        resp.error = dbError.details;
+        console.error(dbError);
+        // resp.error = dbError.details;
       }
     } else if (twitterError) {
       resp.error = twitterError[0].detail ?? 'Unknown Twitter error';
