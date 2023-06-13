@@ -3,7 +3,7 @@ import { twitterClient } from './twitterClient.ts';
 import { Tweet, User } from './types.ts';
 
 // TODO: move to .env
-const MAX_RETRIES = 15;
+const MAX_RETRIES = 10;
 const MIN_DATE = new Date(2020, 1, 1);
 const MONTH_INTERVAL = 2; // Interval between start and end date
 const MONTHS_BEHIND = 3;
@@ -46,7 +46,6 @@ export async function getRandomTweetFromUser(
 
       if (data && meta?.result_count) {
         // console.log(`[+] Got tweet!\n`, data);
-
         const randomIndex = Math.floor(Math.random() * meta.result_count);
 
         const { id, created_at, public_metrics, text } = data[randomIndex];
@@ -64,12 +63,12 @@ export async function getRandomTweetFromUser(
 
           return tweet;
         }
-      } else {
-        tries += 1;
       }
     } catch ({ error }) {
-      console.error(`[!] getRandomTweetFromUser: ${error}`);
+      console.error(`[${tries}] getRandomTweetFromUser: ${error.detail}`);
     }
+
+    tries += 1;
   }
 
   return null;
